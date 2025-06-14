@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BidhaHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #0e0e0e;
+      color: #ffffff;
+    }
+    header {
+      background: #2a004d;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      color: #ffffff;
+      margin: 0;
+    }
+    nav a {
+      color: #ffffff;
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+    .hero {
+      background: #1a1a1a;
+      padding: 2rem;
+      text-align: center;
+    }
+    .hero h2 {
+      color: #cc99ff;
+    }
+    .categories, .listings {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .category, .listing {
+      background: #2a004d;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(204, 153, 255, 0.2);
+    }
+    .listing img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .form-section {
+      padding: 2rem;
+      background: #1a1a1a;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    input, textarea, select, button {
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    input, textarea, select {
+      background: #2a004d;
+      color: white;
+    }
+    button {
+      background: #cc99ff;
+      color: #0e0e0e;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    footer {
+      background: #1a1a1a;
+      color: #aaaaaa;
+      text-align: center;
+      padding: 1rem;
+    }
+    @media (max-width: 600px) {
+      .hero h2 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BidhaHub</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#post">Post Ad</a>
+      <a href="#">Login</a>
+    </nav>
+  </header>
+  <section class="hero">
+    <h2>Soko La Mabidhaa – Nunua na Uuze kwa Urahisi</h2>
+    <p>Post your items. Get buyers. All in one place.</p>
+  </section>
+  <section class="categories">
+    <div class="category">📱 Electronics</div>
+    <div class="category">🚗 Vehicles</div>
+    <div class="category">🏠 Property</div>
+    <div class="category">👗 Fashion</div>
+  </section>
+  <section class="listings" id="listings"></section>
+  <section class="form-section" id="post">
+    <h2 style="text-align:center; color: #cc99ff;">Post a New Ad</h2>
+    <form id="adForm">
+      <input type="text" name="title" placeholder="Item Title" required />
+      <textarea name="description" rows="4" placeholder="Item Description" required></textarea>
+      <input type="text" name="price" placeholder="Price (e.g., KSh 10,000)" required />
+      <select name="category">
+        <option value="">Select Category</option>
+        <option value="electronics">Electronics</option>
+        <option value="vehicles">Vehicles</option>
+        <option value="property">Property</option>
+        <option value="fashion">Fashion</option>
+      </select>
+      <input type="text" name="location" placeholder="Location (e.g., Nairobi)" required />
+      <input type="file" name="image" accept="image/*" />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <button type="submit">Post Ad</button>
+    </form>
+  </section>
+  <footer>
+    &copy; 2025 BidhaHub – Built for Hustlers by Hustlers.
+  </footer>
+  <script>
+    const adForm = document.getElementById('adForm');
+    adForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(adForm);
+      const res = await fetch('http://localhost:5000/ads', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        alert('Ad posted successfully!');
+        adForm.reset();
+        loadListings();
+      } else {
+        alert('Failed to post ad');
+      }
+    });
+
+    async function loadListings() {
+      const res = await fetch('http://localhost:5000/ads');
+      const ads = await res.json();
+      const listingsContainer = document.getElementById('listings');
+      listingsContainer.innerHTML = ads.map(ad => `
+        <div class="listing">
+          <img src="http://localhost:5000${ad.image}" alt="${ad.title}" />
+          <h3>${ad.title}</h3>
+          <p>${ad.price} – ${ad.location}</p>
+        </div>
+      `).join('');
+    }
+
+    window.onload = loadListings;
+  </script>
+</body>
+</html>
